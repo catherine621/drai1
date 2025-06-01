@@ -1,0 +1,161 @@
+gender,age,apacheadmissiondx,admissionheight,unitvisitnumber,admissionweight,visittype,Pid
+Male,45,"Hypertension, uncontrolled (for cerebrovascular accident-see Neurological System)",178.0,1,116.0,Follow-up,P00001
+Male,50,Ablation or mapping of cardiac conduction pathway,177.8,1,106.1,Follow-up,P00002
+Male,49,"Infarction, acute myocardial (MI)",185.4,1,145.3,Emergency,P00003
+Female,80,Emphysema/bronchitis,170.2,1,65.3,Routine,P00004
+Female,48,Alcohol withdrawal,177.8,1,86.4,Routine,P00005
+Female,59,"Overdose, sedatives, hypnotics, antipsychotics, benzodiazepines",170.2,1,66.6,Emergency,P00006
+Male,31,Diabetic ketoacidosis,188.0,1,66.8,Emergency,P00007
+Female,51,"Overdose, alcohols (bethanol, methanol, ethylene glycol)",160.0,1,77.1,Emergency,P00008
+Male,58,Ablation or mapping of cardiac conduction pathway,185.4,1,89.3,Follow-up,P00009
+Female,48,Drug withdrawal,172.7,1,63.4,Routine,P00010
+Female,68,Ablation or mapping of cardiac conduction pathway,172.7,1,75.9,Follow-up,P00011
+Female,52,Ablation or mapping of cardiac conduction pathway,167.6,2,86.0,Follow-up,P00012
+Male,40,"Angina, unstable (angina interferes w/quality of life or meds are tolerated poorly)",175.3,1,100.7,Emergency,P00013
+Female,79,"Renal failure, acute",168.9,1,51.1,Emergency,P00014
+Male,65,"Infarction, acute myocardial (MI)",177.8,1,102.5,Emergency,P00015
+Female,57,"Hip replacement, total (non-traumatic)",154.9,1,96.1,Follow-up,P00016
+Male,63,"Shock, cardiogenic",167.6,1,71.9,Emergency,P00017
+Female,34,"Hypertension, uncontrolled (for cerebrovascular accident-see Neurological System)",157.5,1,85.9,Follow-up,P00018
+Male,67,"CVA, cerebrovascular accident/stroke",182.9,1,104.8,Emergency,P00019
+Female,86,Hypothermia,170.2,1,56.7,Emergency,P00020
+Female,62,"Rhythm disturbance (atrial, supraventricular)",160.0,1,95.5,Follow-up,P00021
+Male,61,"Sepsis, pulmonary",172.7,1,57.8,Emergency,P00022
+Male,74,"Angina, unstable (angina interferes w/quality of life or meds are tolerated poorly)",177.8,1,88.5,Emergency,P00023
+Male,58,"Sepsis, GI",177.8,1,99.24,Emergency,P00024
+Male,72,"Vascular medical, other",177.8,1,70.3,Routine,P00025
+Male,75,"Sepsis, pulmonary",172.72,1,69.2,Emergency,P00026
+Male,79,"Bleeding, GI-location unknown",180.3,1,87.0,Emergency,P00027
+Male,41,"Hypertension, uncontrolled (for cerebrovascular accident-see Neurological System)",172.7,1,110.4,Follow-up,P00028
+Female,89,"CHF, congestive heart failure",154.9,1,69.5,Follow-up,P00029
+Male,67,"Pneumonia, other",160.0,1,75.8,Emergency,P00030
+Female,86,"Bleeding, lower GI",154.9,1,66.2,Emergency,P00031
+Male,69,"Rhythm disturbance (atrial, supraventricular)",172.7,1,106.4,Follow-up,P00032
+Male,87,Emphysema/bronchitis,175.2,1,63.2,Routine,P00033
+Male,87,Emphysema/bronchitis,175.2,3,63.2,Follow-up,P00034
+Female,89,"CHF, congestive heart failure",165.1,1,58.0,Follow-up,P00035
+Female,52,"Coma/change in level of consciousness (for hepatic see GI, for diabetic see Endocrine, if related to cardiac arrest, see CV)",157.5,1,82.3,Emergency,P00036
+Female,87,"Hip replacement, total (non-traumatic)",157.5,1,53.18,Follow-up,P00037
+Male,76,"Thrombus, arterial",172.7,1,85.7,Emergency,P00038
+Female,86,"CVA, cerebrovascular accident/stroke",160.0,1,62.9,Emergency,P00039
+Female,62,"Aneurysm/pseudoaneurysm, other",157.5,1,91.5,Emergency,P00040
+Female,83,Shunts and revisions,157.5,1,110.1,Follow-up,P00041
+Male,58,"CHF, congestive heart failure",177.8,1,104.0,Follow-up,P00042
+Female,63,"CHF, congestive heart failure",157.4,1,107.1,Follow-up,P00043
+Male,63,Diabetic ketoacidosis,180.3,1,95.3,Emergency,P00044
+Male,56,"Angina, unstable (angina interferes w/quality of life or meds are tolerated poorly)",170.2,1,83.2,Emergency,P00045
+Female,54,"Neoplasm-cranial, surgery for (excluding transphenoidal)",160.0,1,54.0,Follow-up,P00046
+Female,89,"Pneumonia, viral",165.1,1,66.1,Emergency,P00047
+Female,84,"Arrest, respiratory (without cardiac arrest)",170.1,1,91.3,Emergency,P00048
+Female,84,"Rhythm disturbance (atrial, supraventricular)",170.1,2,89.0,Follow-up,P00049
+Female,86,"Orthopedic surgery, other",142.2,1,45.8,Follow-up,P00050
+Female,84,Rhythm disturbance (conduction defect),162.6,1,147.4,Follow-up,P00051
+Female,84,Rhythm disturbance (ventricular),154.9,1,70.3,Emergency,P00052
+Female,73,"Hemorrhage/hematoma, intracranial",160.0,1,61.6,Emergency,P00053
+Female,74,"Sepsis, renal/UTI (including bladder)",162.6,1,52.0,Emergency,P00054
+Female,81,"CHF, congestive heart failure",160.0,1,70.3,Follow-up,P00055
+Female,55,"Overdose, sedatives, hypnotics, antipsychotics, benzodiazepines",172.7,1,99.0,Emergency,P00056
+Female,64,"Sepsis, pulmonary",152.4,1,68.1,Emergency,P00057
+Male,58,"CHF, congestive heart failure",177.8,2,104.8,Follow-up,P00058
+Female,54,"Rhythm disturbance (atrial, supraventricular)",167.6,2,109.1,Follow-up,P00059
+Female,54,"Respiratory - medical, other",167.6,1,104.4,Routine,P00060
+Female,83,"Sepsis, renal/UTI (including bladder)",154.9,1,41.8,Emergency,P00061
+Female,64,Diabetic ketoacidosis,170.2,1,63.7,Emergency,P00062
+Female,67,"Respiratory - medical, other",167.64,1,74.8,Routine,P00063
+Female,80,Head only trauma,170.2,1,54.6,Emergency,P00064
+Female,59,"Sepsis, unknown",175.0,2,109.7,Emergency,P00065
+Male,59,"Sepsis, pulmonary",178.0,2,63.1,Emergency,P00066
+Female,54,"Respiratory - medical, other",172.0,2,54.2,Routine,P00067
+Male,45,Diabetic ketoacidosis,175.3,2,90.5,Emergency,P00068
+Male,37,"Sepsis, other",169.0,1,106.2,Emergency,P00069
+Male,59,"Sepsis, other",178.0,1,70.0,Emergency,P00070
+Male,67,"Respiratory - medical, other",172.7,2,75.8,Routine,P00071
+Male,41,Pancreatitis,178.0,2,72.5,Emergency,P00072
+Male,52,"Bleeding, lower GI",170.0,1,83.4,Emergency,P00073
+Male,37,"Coma/change in level of consciousness (for hepatic see GI, for diabetic see Endocrine, if related to cardiac arrest, see CV)",147.3,1,65.7,Emergency,P00074
+Female,62,Seizures (primary-no structural brain disease),160.0,1,51.5,Emergency,P00075
+Male,50,"Thrombus, arterial",185.0,3,61.8,Emergency,P00076
+Male,54,"Infarction, acute myocardial (MI)",182.0,1,109.8,Emergency,P00077
+Male,59,"CABG alone, coronary artery bypass grafting",171.8,1,108.8,Follow-up,P00078
+Female,63,"Vascular medical, other",160.0,2,61.7,Routine,P00079
+Male,50,"Aneurysm, dissecting aortic",185.0,2,61.8,Emergency,P00080
+Female,70,"CABG alone, coronary artery bypass grafting",167.6,3,69.0,Follow-up,P00081
+Female,78,"Graft, all other bypass (except renal)",160.0,1,104.0,Follow-up,P00082
+Male,69,"Monitoring, hemodynamic (pre-operative evaluation)",172.0,1,88.7,Follow-up,P00083
+Female,73,Mitral valve repair,168.0,1,65.0,Follow-up,P00084
+Male,24,Endocarditis,180.3,1,67.8,Emergency,P00085
+Female,59,"Aneurysm, thoracic aortic",165.1,1,66.0,Emergency,P00086
+Female,67,"Shock, cardiogenic",162.6,1,70.0,Emergency,P00087
+Female,65,MI admitted > 24 hrs after onset of ischemia,188.0,1,87.5,Follow-up,P00088
+Female,81,"Bleeding, upper GI",95.1,1,98.0,Emergency,P00089
+Male,55,Heart transplant,180.4,1,90.4,Follow-up,P00090
+Female,80,Aortic valve replacement (isolated),162.6,1,72.5,Follow-up,P00091
+Female,74,"Hypertension, uncontrolled (for cerebrovascular accident-see Neurological System)",165.1,1,81.8,Routine,P00092
+Female,21,"Overdose, street drugs (opiates, cocaine, amphetamine)",160.0,1,49.5,Emergency,P00093
+Female,39,Diabetic ketoacidosis,172.7,1,97.7,Emergency,P00094
+Male,50,"Bleeding, upper GI",172.7,1,86.5,Emergency,P00095
+Female,61,"Angina, unstable (angina interferes w/quality of life or meds are tolerated poorly)",177.8,1,96.6,Emergency,P00096
+Female,77,"Bleeding, lower GI",160.0,1,83.6,Emergency,P00097
+Male,54,"Infarction, acute myocardial (MI)",182.9,1,127.3,Emergency,P00098
+Female,53,"Hematoma, subdural",157.5,1,68.9,Emergency,P00099
+Female,86,"Bleeding, GI-location unknown",157.5,1,59.1,Emergency,P00100
+Female,72,"Cancer, pancreatic",152.4,1,59.1,Routine,P00101
+Female,64,Myasthenia gravis,152.4,1,77.5,Routine,P00102
+Female,73,"Infarction, acute myocardial (MI)",160.0,1,71.8,Emergency,P00103
+Female,77,"Rhythm disturbance (atrial, supraventricular)",160.0,1,78.5,Routine,P00104
+Female,41,"Hypovolemia (including dehydration, Do not include shock states)",175.3,1,100.0,Routine,P00105
+Female,65,Hypoglycemia,204.5,1,170.2,Emergency,P00106
+Female,89,"CHF, congestive heart failure",167.6,1,54.5,Routine,P00107
+Male,89,Subarachnoid hemorrhage/intracranial aneurysm,175.3,1,70.5,Emergency,P00108
+Female,81,"Rhythm disturbance (atrial, supraventricular)",157.5,3,70.0,Routine,P00109
+Female,81,"Rhythm disturbance (atrial, supraventricular)",157.5,1,70.0,Routine,P00110
+Female,59,"Neurologic surgery, other",158.2,1,74.5,Routine,P00111
+Female,89,"Sepsis, renal/UTI (including bladder)",160.0,1,77.3,Emergency,P00112
+Male,42,"ARDS-adult respiratory distress syndrome, non-cardiogenic pulmonary edema",188.0,1,114.2,Emergency,P00113
+Male,76,"Infection/abscess, other surgery for",182.3,2,86.9,Routine,P00114
+Male,76,"Esophageal surgery, other",182.3,1,86.9,Routine,P00115
+Female,82,"CHF, congestive heart failure",165.1,1,36.9,Routine,P00116
+Female,38,"ARDS-adult respiratory distress syndrome, non-cardiogenic pulmonary edema",167.6,1,104.0,Emergency,P00117
+Female,72,"Pneumonia, bacterial",152.4,1,70.5,Emergency,P00118
+Male,81,Aortic valve replacement (isolated),175.3,1,93.8,Follow-up,P00119
+Female,60,Renal infection/abscess,162.6,1,93.7,Emergency,P00120
+Male,76,"Coma/change in level of consciousness (for hepatic see GI, for diabetic see Endocrine, if related to cardiac arrest, see CV)",189.2,1,104.2,Emergency,P00121
+Female,39,Heart transplant,160.0,1,42.1,Follow-up,P00122
+Male,46,"Sepsis, other",170.2,1,76.2,Emergency,P00123
+Female,56,Emphysema/bronchitis,171.5,1,81.1,Routine,P00124
+Female,74,"Fracture-pathological, non-union, non-traumatic, for fractures due to trauma see Trauma",162.6,1,63.5,Routine,P00125
+Female,64,"Respiratory - medical, other",154.9,1,51.4,Routine,P00126
+Female,69,Whipple-surgery for pancreatic cancer,167.6,1,78.7,Routine,P00127
+Female,73,"Bleeding, GI-location unknown",167.6,1,70.0,Emergency,P00128
+Female,76,Cardiac arrest (with or without respiratory arrest; for respiratory arrest see Respiratory System),162.6,1,60.0,Emergency,P00129
+gender,age,apacheadmissiondx,admissionheight,unitvisitnumber,admissionweight,visittype,P00130
+Female,61,Hemorrhage (for gastrointestinal bleeding GI-see GI system) (for trauma see Trauma),167.6,1,68.3,Emergency,P00131
+Female,34,Cesarean section,167.6,1,103.0,Routine,P00132
+Female,63,"Angina, unstable (angina interferes w/quality of life or meds are tolerated poorly)",157.5,1,91.1,Emergency,P00133
+Female,70,MI admitted > 24 hrs after onset of ischemia,167.6,1,71.3,Routine,P00134
+Female,66,Aortic valve replacement (isolated),167.6,1,90.8,Follow-up,P00135
+Female,75,CABG with other operation,157.5,1,63.0,Follow-up,P00136
+Female,68,"CABG alone, coronary artery bypass grafting",160.0,1,75.9,Follow-up,P00137
+Female,58,Aortic and Mitral valve replacement,170.2,1,119.7,Follow-up,P00138
+Male,61,Aortic valve replacement (isolated),185.4,1,88.8,Follow-up,P00139
+Female,58,"CABG alone, coronary artery bypass grafting",167.6,1,80.9,Follow-up,P00140
+Female,44,"Aneurysm, thoracic aortic; with dissection",175.3,1,80.7,Emergency,P00141
+Female,76,"CHF, congestive heart failure",162.6,1,55.5,Routine,P00142
+Male,56,"CHF, congestive heart failure",170.2,1,119.1,Routine,P00143
+Male,59,"Pneumonia, viral",180.3,1,88.8,Emergency,P00144
+Female,67,"Sepsis, other",175.0,1,57.7,Emergency,P00145
+Female,86,"Rhythm disturbance (atrial, supraventricular)",165.0,1,53.6,Routine,P00146
+Male,56,"Infarction, acute myocardial (MI)",170.2,1,121.4,Emergency,P00147
+Female,66,"Sepsis, GI",152.4,1,71.0,Emergency,P00148
+Female,65,Diabetic ketoacidosis,152.4,1,52.5,Emergency,P00149
+Female,65,MI admitted > 24 hrs after onset of ischemia,152.4,2,52.5,Routine,P00150
+Male,84,"Arrest, respiratory (without cardiac arrest)",167.6,1,75.0,Emergency,P00151
+Female,44,"Overdose, sedatives, hypnotics, antipsychotics, benzodiazepines",167.6,1,70.9,Emergency,P00152
+Female,73,"Hemorrhage/hematoma, intracranial",170.2,1,72.57,Emergency,P00153
+Male,75,"Coma/change in level of consciousness (for hepatic see GI, for diabetic see Endocrine, if related to cardiac arrest, see CV)",182.8,1,95.4,Emergency,P00154
+Female,67,"CHF, congestive heart failure",162.5,1,136.4,Routine,P00155
+Female,68,"CVA, cerebrovascular accident/stroke",165.1,1,81.8,Emergency,P00156
+Male,74,"Pneumonia, bacterial",188.0,1,100.0,Emergency,P00157
+Female,65,Rhythm disturbance (conduction defect),157.5,1,77.3,Routine,P00158
+Female,54,"Neurologic medical, other",162.5,1,56.8,Routine,P00159
+Female,70,"Sepsis, GI",165.1,1,78.9,Emergency,P00160

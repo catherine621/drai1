@@ -1,0 +1,89 @@
+.navbar {
+  width: 100vw;
+  max-width: 100%;
+  background-color: #0f1c3f;
+  color: #f0f9ff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 5px;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  font-family: 'Segoe UI', sans-serif;
+  z-index: 1000;
+}
+
+
+
+/* Left logo + brand */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+}
+
+.brand-name {
+  font-size: 30px;
+  font-weight: bold;
+  color: #ffff;
+}
+
+/* Navigation links */
+.navbar-links {
+  display: flex;
+  gap: 20px;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: #ffff;
+  font-weight: 500;
+}
+
+/* Right action buttons */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.call-box {
+  display: flex;
+  align-items: center;
+  background: #f0f9ff;
+  padding: 0px 10px;
+  border-radius: 12px;
+}
+
+.phone-icon {
+  font-size: 20px;
+  margin-right: 8px;
+  color: #fff;
+}
+
+.call-info small {
+  display: block;
+  font-size: 10px;
+  color: #555;
+}
+
+.call-info strong {
+  font-size: 14px;
+  color: #0f1c3f;
+}
+
+/* Appointment button */
+.appointment-btn {
+  background-color: #ffff;
+  color: black;
+  padding: 10px 20px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: bold;
+}
