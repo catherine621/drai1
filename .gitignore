@@ -1,2 +1,6 @@
 .env 
+<<<<<<< HEAD
 .env 
+=======
+>>>>>>> f9a97a9 (Add .env to .gitignore to prevent uploading secrets)
+backend/.env 
