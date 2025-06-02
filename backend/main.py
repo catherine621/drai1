@@ -28,8 +28,14 @@ from fastapi import APIRouter
 import json
 from concurrent.futures import ThreadPoolExecutor
 import asyncio
+<<<<<<< HEAD
 from flask import Flask, jsonify 
 import h5py
+=======
+from flask import Flask, jsonify
+from ultralytics import YOLO
+import logging
+>>>>>>> 38f614d (Updated hospital frontend files)
 
 # Load environment variables
 
@@ -137,7 +143,9 @@ def read_root():
 @app.get("/api/patients")
 async def get_patients():
     patients = []
-    async for patient in patients_collection.find({}, {"_id": 0}):
+    async for patient in patients_collection.find():
+        patient["medical_id"] = str(patient["_id"])
+        patient.pop("_id", None)
         patients.append(patient)
     return patients
 
@@ -214,6 +222,57 @@ ENCODINGS_PATH = "encodings.h5"
 #ENCODINGS_PATH = "encodings.npy"
 METADATA_PATH = "metadata.json"
 
+<<<<<<< HEAD
+=======
+async def build_and_save_index():
+    global faiss_index, metadata
+
+    print("🔧 Starting to build FAISS index...")
+
+    metadata.clear()
+    encodings = []
+    
+
+
+    patients = await patients_collection.find().to_list(length=100)
+    print(f"📦 Found {len(patients)} patients in MongoDB")
+
+    for patient in patients:
+        try:
+            encoding = patient.get("face_embedding")
+            if encoding and isinstance(encoding, list) and len(encoding) == 128:
+                encodings.append(np.array(encoding, dtype=np.float32))
+                metadata.append({
+                    "name": patient.get("name", "Unknown"),
+                    "medical_id": str(patient.get("_id"))
+                })
+                print(f"✅ Valid encoding for {patient.get('name')}")
+            else:
+                print(f"⚠ Invalid embedding for {patient.get('name')}: {encoding}")
+        except Exception as e:
+            print(f"❌ Error processing patient: {e}")
+            continue
+
+    if encodings:
+        encodings_np = np.array(encodings).astype("float32")
+        faiss.normalize_L2(encodings_np)
+
+        np.save(ENCODINGS_PATH, encodings_np)
+        with open(METADATA_PATH, "w") as f:
+            json.dump(metadata, f)
+
+        dim = 128
+        faiss_index = faiss.IndexFlatIP(dim)
+        faiss_index.add(encodings_np)
+        print(f"✅ FAISS index built with {len(encodings)} encodings.")
+    else:
+        print("❌ No valid face encodings found. metadata.json will be empty.")
+@app.on_event("startup")
+async def startup_event():
+    await load_index_from_disk()
+    asyncio.create_task(poll_patient_updates())  # Polls for new patients periodically
+
+>>>>>>> 38f614d (Updated hospital frontend files)
 # -------------------------------
 # Load FAISS Index
 # -------------------------------
@@ -221,8 +280,14 @@ async def load_index_from_disk():
     global faiss_index, metadata
 
     if not os.path.exists(ENCODINGS_PATH) or not os.path.exists(METADATA_PATH):
+<<<<<<< HEAD
         raise FileNotFoundError("Encodings or metadata files are missing.")
 
+=======
+        print("⚠ Missing index files. Building fresh index...")
+        await build_and_save_index()
+        return
+>>>>>>> 38f614d (Updated hospital frontend files)
 
     try:
         with h5py.File(ENCODINGS_PATH, "r") as f:
@@ -232,29 +297,168 @@ async def load_index_from_disk():
             metadata = json.load(f)
 
         faiss_index = faiss.IndexFlatIP(128)
+        faiss.normalize_L2(encodings_np)
         faiss_index.add(encodings_np)
-        print("✅ FAISS index loaded from disk.")
+        print("✅ FAISS index and metadata loaded from disk.")
     except Exception as e:
-        print(f"❌ Error loading FAISS index: {e}")
-        raise e
+        print(f"❌ Failed to load index: {e}")
+        await build_and_save_index()
+
+async def watch_patient_changes():
+    print("👀 Starting MongoDB watch...")
+    async with patients_collection.watch(
+        [{"$match": {"operationType": "insert"}}],
+        full_document="updateLookup"
+    ) as stream:
+        async for change in stream:
+            try:
+                new_doc = change.get("fullDocument")
+                print(f"📥 New patient inserted: {new_doc.get('name')}")
+
+                encoding = new_doc.get("face_embedding")
+                if encoding and isinstance(encoding, list) and len(encoding) == 128:
+                    encoding_np = np.array([encoding], dtype=np.float32)
+                    faiss.normalize_L2(encoding_np)
+
+                    # Add new encoding to index
+                    if faiss_index is None:
+                        print("⚠ FAISS index not initialized. Rebuilding index...")
+                        await build_and_save_index()
+                        return
+
+                    faiss_index.add(encoding_np)
+
+                    # Append metadata and save to file
+                    new_meta = {
+                        "name": new_doc.get("name", "Unknown"),
+                        "medical_id": str(new_doc.get("_id"))
+                    }
+                    metadata.append(new_meta)
+
+                    # Save updated metadata
+                    with open(METADATA_PATH, "w") as f:
+                        json.dump(metadata, f)
+
+                    # Append new encoding to encodings.npy
+                    existing_encodings = np.load(ENCODINGS_PATH)
+                    updated_encodings = np.vstack([existing_encodings, encoding_np])
+                    np.save(ENCODINGS_PATH, updated_encodings)
+
+                    print(f"✅ Index and metadata updated with new patient: {new_doc['name']}")
+                else:
+                    print(f"⚠ Skipped: Invalid face embedding for {new_doc.get('name')}")
+
+            except Exception as e:
+                print(f"❌ Error in watch_patient_changes: {e}")
+import aiohttp
+
+async def poll_patient_updates(interval_seconds: int = 30):
+    global faiss_index, metadata
+
+    seen_ids = set(m["medical_id"] for m in metadata)
+    print("🔁 Starting patient polling loop...")
+
+    while True:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get("http://localhost:8000/api/patients") as response:
+                    if response.status != 200:
+                        print(f"⚠ Failed to fetch patients: {response.status}")
+                        await asyncio.sleep(interval_seconds)
+                        continue
+
+                    new_patients = await response.json()
+
+                    new_encodings = []
+                    new_metadata = []
+
+                    for patient in new_patients:
+                        medical_id = str(patient.get("medical_id"))
+                        if medical_id in seen_ids:
+                            continue
+
+                        encoding = patient.get("face_embedding")
+                        if encoding and isinstance(encoding, list) and len(encoding) == 128:
+                            encoding_np = np.array([encoding], dtype=np.float32)
+                            faiss.normalize_L2(encoding_np)
+
+                            if faiss_index is None:
+                                print("⚠ FAISS index not initialized. Rebuilding index...")
+                                await build_and_save_index()
+                                break
+
+                            faiss_index.add(encoding_np)
+
+                            meta = {
+                                "name": patient.get("name", "Unknown"),
+                                "medical_id": medical_id
+                            }
+
+                            metadata.append(meta)
+                            new_encodings.append(encoding_np)
+                            new_metadata.append(meta)
+                            seen_ids.add(medical_id)
+
+                            print(f"✅ Added new patient to index: {patient.get('name')}")
+
+                    # Save updated metadata and encodings if new were added
+                    if new_encodings:
+                        with open(METADATA_PATH, "w") as f:
+                            json.dump(metadata, f)
+
+                        existing_encodings = np.load(ENCODINGS_PATH)
+                        updated_encodings = np.vstack([existing_encodings] + new_encodings)
+                        np.save(ENCODINGS_PATH, updated_encodings)
+
+        except Exception as e:
+            print(f"❌ Polling error: {e}")
+
+        await asyncio.sleep(interval_seconds)
 
 # -------------------------------
 # Match Face Endpoint
 # -------------------------------
 
+<<<<<<< HEAD
 index_lock=asyncio.Lock()
+=======
+
+try:
+    model = YOLO("yolov8n-face-lindevs.pt")  # Ensure this model file exists
+    logging.info("✅ YOLO model loaded")
+except Exception as e:
+    logging.error(f"❌ Failed to load YOLO model: {e}")
+    model = None
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
+>>>>>>> 38f614d (Updated hospital frontend files)
 @app.post("/match_face/")
 async def match_face(file: UploadFile = File(...)):
     global faiss_index, metadata
 
     try:
-        image_bytes = await file.read()
-        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-        np_image = np.array(image)
+        if model is None:
+            raise HTTPException(status_code=500, detail="YOLO model not loaded")
 
-        encodings = face_recognition.face_encodings(np_image)
-        if not encodings:
+        image_bytes = await file.read()
+        np_arr = np.frombuffer(image_bytes, np.uint8)
+        image_bgr = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+        results = model(image_bgr)[0]
+        if len(results.boxes) == 0:
             raise HTTPException(status_code=400, detail="No face detected in the image.")
+
+        # Use the first detected face
+        x1, y1, x2, y2 = map(int, results.boxes[0].xyxy[0])
+        cropped_face = image_bgr[y1:y2, x1:x2]
+
+        # Convert to RGB for face_recognition
+        cropped_rgb = cv2.cvtColor(cropped_face, cv2.COLOR_BGR2RGB)
+        encodings = face_recognition.face_encodings(cropped_rgb)
+
+        if not encodings:
+            raise HTTPException(status_code=400, detail="Failed to encode the detected face.")
 
         uploaded_encoding = np.array(encodings[0], dtype=np.float32).reshape(1, -1)
         faiss.normalize_L2(uploaded_encoding)
@@ -275,7 +479,7 @@ async def match_face(file: UploadFile = File(...)):
         if index < len(metadata):
             print(f"🔎 Closest Match: {metadata[index]}")
 
-        if similarity > 0.9:  # Reduce threshold to test
+        if similarity > 0.9:  # Adjust threshold as needed
             match = metadata[index]
             return {
                 "status": "matched",
@@ -284,7 +488,11 @@ async def match_face(file: UploadFile = File(...)):
 
         return {"status": "not_found"}
 
+    except HTTPException as http_exc:
+        raise http_exc
+
     except Exception as e:
+        logging.error(f"Error in match_face: {e}")
         return JSONResponse(status_code=500, content={
             "status": "error",
             "message": f"Exception occurred: {str(e)}"
@@ -448,7 +656,7 @@ async def get_patient(medical_id: str):
     try:
         patient = await patients_collection.find_one({"_id": ObjectId(medical_id)})
     except Exception as e:
-        print(f"⚠️ Error converting to ObjectId: {e}")
+        print(f"⚠ Error converting to ObjectId: {e}")
         raise HTTPException(status_code=400, detail="Invalid medical ID format")
 
     if not patient:

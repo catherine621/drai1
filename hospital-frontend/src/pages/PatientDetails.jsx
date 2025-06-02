@@ -42,23 +42,65 @@ const PatientDetails = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch("http://localhost:8000/save_to_records", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      const result = await res.json();
-      alert(result.message || "Saved successfully!");
-    } catch (err) {
-      console.error("Error saving:", err);
-      alert("Failed to save changes.");
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    // Step 1: Save initial patient details
+    const res = await fetch("http://localhost:8000/save_to_records", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    const result = await res.json();
+
+    if (!res.ok) {
+      throw new Error(result.message || "Failed to save changes.");
     }
-  };
+
+    alert(result.message || "Saved successfully!");
+
+    // Step 2: Call prediction API
+    const predictRes = await fetch(`http://localhost:8000/predict/${formData._id}`);
+    const predictData = await predictRes.json();
+
+    if (!predictRes.ok) {
+      alert(predictData.detail || "Prediction failed.");
+      return;
+    }
+
+    alert(`✅ Predicted Visit Type: ${predictData.predicted_visit_type}`);
+
+    // Step 3: Add prediction result to formData
+    const updatedFormData = {
+      ...formData,
+      predicted_visit_type: predictData.predicted_visit_type,
+    };
+
+    // Step 4: Save the updated data (with prediction) again to the DB
+    const savePredicted = await fetch("http://localhost:8000/save_to_records", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedFormData),
+    });
+
+    const finalSaveResult = await savePredicted.json();
+
+    if (!savePredicted.ok) {
+      alert(finalSaveResult.message || "Failed to save prediction.");
+    } else {
+      alert("📁 Final patient data with prediction saved to records database.");
+    }
+
+  } catch (err) {
+    console.error("Error:", err);
+    alert("An error occurred during saving or prediction.");
+  }
+};
+
 
   if (loading) return <p>Loading patient data...</p>;
   if (!formData) return <p>No patient data found.</p>;

@@ -7,6 +7,7 @@ const FaceMatchUpload = () => {
   const canvasRef = useRef(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [error, setError] = useState(null);
+  const [autoCaptured, setAutoCaptured] = useState(false); // prevent multiple calls
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,6 +19,14 @@ const FaceMatchUpload = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+
+        // Wait 2 seconds, then auto-capture
+        setTimeout(() => {
+          if (!autoCaptured) {
+            captureAndSubmit();
+            setAutoCaptured(true);
+          }
+        }, 2000); // ⏱️ wait 2 seconds before auto capture
       }
     } catch (err) {
       console.error("Camera error:", err);
@@ -46,48 +55,44 @@ const FaceMatchUpload = () => {
     }, "image/jpeg");
   };
 
-const handleFaceMatch = async (formData) => {
-  try {
-    const response = await axios.post("http://localhost:8000/match_face/", formData);
-    const data = response.data;
+  const handleFaceMatch = async (formData) => {
+    try {
+      const response = await axios.post("http://localhost:8000/match_face/", formData);
+      const data = response.data;
 
-    console.log("Backend response:", data); // ✅ Debug log
+      console.log("Backend response:", data); // ✅ Debug log
 
-    if (data && data.status === "matched" && data.medical_id) {
-      navigate(`/patient-details/${data.medical_id}`, {
-        state: { patientData: data },
-      });
-    } else {
+      if (data && data.status === "matched" && data.medical_id) {
+        navigate(`/patient-details/${data.medical_id}`, {
+          state: { patientData: data },
+        });
+      } else {
+        navigate("/patient-details", {
+          state: {
+            data: {
+              match: false,
+              message: "No matching patient found.",
+            },
+          },
+        });
+      }
+    } catch (err) {
+      console.error("Face match error:", err);
       navigate("/patient-details", {
         state: {
           data: {
             match: false,
-            message: "No matching patient found.",
+            message: err.response?.data?.detail || "Error during face match.",
           },
         },
       });
     }
-  } catch (err) {
-    console.error("Face match error:", err);
-    navigate("/patient-details", {
-      state: {
-        data: {
-          match: false,
-          message: err.response?.data?.detail || "Error during face match.",
-        },
-      },
-    });
-  }
-};
-
+  };
 
   return (
     <div style={{ fontFamily: "Arial", padding: "20px" }}>
       <h2>🎥 Face Match Upload</h2>
       <video ref={videoRef} width="300" height="200" autoPlay />
-      <br />
-      <button onClick={captureAndSubmit}>Capture & Submit</button>
-
       <canvas ref={canvasRef} width="300" height="200" style={{ display: "none" }} />
 
       {imagePreview && (
