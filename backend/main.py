@@ -28,7 +28,8 @@ from fastapi import APIRouter
 import json
 from concurrent.futures import ThreadPoolExecutor
 import asyncio
-from flask import Flask, jsonify
+from flask import Flask, jsonify 
+import h5py
 
 # Load environment variables
 
@@ -141,79 +142,7 @@ async def get_patients():
     return patients
 
 
-@app.post("/api/patients")
-async def register_patient(
-    name: str = Form(...),
-    dob: str = Form(...),
-    address: str = Form(...),
-    phone_number: str = Form(...),
-    email_id: str = Form(...),
-    admissionheight: str = Form(...),
-    admissionweight: str = Form(...),
-    blood_pressure: str = Form(...),
-    age: str = Form(...),
-    gender: str = Form(...),
-    unitvisitnumber: str = Form(...),
-    apacheadmissiondx: str = Form(...),
-    picture: UploadFile = File(...)
-):
-    try:
-        # Read image and convert to base64
-        image_bytes = await picture.read()
-        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
 
-        # Load image using PIL and convert to numpy array
-        image = face_recognition.load_image_file(io.BytesIO(image_bytes))
-
-        # Detect face and extract embeddings
-        face_encodings = face_recognition.face_encodings(image)
-
-        if not face_encodings:
-            return JSONResponse(status_code=400, content={"error": "No face found in the image."})
-
-        face_embedding = face_encodings[0].tolist()  # Convert NumPy array to list for MongoDB
-
-        # Format phone number
-        if not phone_number.startswith("+"):
-            phone_number = "+91" + phone_number.lstrip("0")
-
-        # Create the patient document
-        patient_doc = {
-            "name": name,
-            "dob": dob,
-            "address": address,
-            "phone_number": phone_number,
-            "email_id": email_id,
-            "admissionheight": admissionheight,
-            "admissionweight": admissionweight,
-            "blood_pressure": blood_pressure,
-            "age": age,
-            "gender": gender,
-            "unitvisitnumber": unitvisitnumber,
-            "apacheadmissiondx": apacheadmissiondx,
-            "image_base64": image_base64,
-            "face_embedding": face_embedding
-        }
-
-        # Insert into MongoDB
-        insert_result = await patients_collection.insert_one(patient_doc)
-
-        # Send SMS using Twilio
-        message = twilio_client.messages.create(
-            body=f"Hi {name}, you are successfully registered at the hospital.",
-            from_=twilio_number,
-            to=phone_number
-        )
-
-        return {
-            "message": "Patient registered successfully",
-            "sms_sid": message.sid,
-            "patient_id": str(insert_result.inserted_id)
-        }
-
-    except Exception as e:
-        traceback.print_exc()
-        return JSONResponse(status_code=500, content={"error": str(e)})
 
 
 
@@ -281,56 +210,9 @@ async def predict_visit_type_from_db(patient_id: str):
 metadata = []
 faiss_index = None
 
-ENCODINGS_PATH = "encodings.npy"
+ENCODINGS_PATH = "encodings.h5"
+#ENCODINGS_PATH = "encodings.npy"
 METADATA_PATH = "metadata.json"
-
-async def build_and_save_index():
-    global faiss_index, metadata
-
-    print("🔧 Starting to build FAISS index...")
-
-    metadata.clear()
-    encodings = []
-    
-
-
-    patients = await patients_collection.find().to_list(length=100)
-    print(f"📦 Found {len(patients)} patients in MongoDB")
-
-    for patient in patients:
-        try:
-            encoding = patient.get("face_embedding")
-            if encoding and isinstance(encoding, list) and len(encoding) == 128:
-                encodings.append(np.array(encoding, dtype=np.float32))
-                metadata.append({
-                    "name": patient.get("name", "Unknown"),
-                    "medical_id": str(patient.get("_id"))
-                })
-                print(f"✅ Valid encoding for {patient.get('name')}")
-            else:
-                print(f"⚠️ Invalid embedding for {patient.get('name')}: {encoding}")
-        except Exception as e:
-            print(f"❌ Error processing patient: {e}")
-            continue
-
-    if encodings:
-        encodings_np = np.array(encodings).astype("float32")
-        faiss.normalize_L2(encodings_np)
-
-        np.save(ENCODINGS_PATH, encodings_np)
-        with open(METADATA_PATH, "w") as f:
-            json.dump(metadata, f)
-
-        dim = 128
-        faiss_index = faiss.IndexFlatIP(dim)
-        faiss_index.add(encodings_np)
-        print(f"✅ FAISS index built with {len(encodings)} encodings.")
-    else:
-        print("❌ No valid face encodings found. metadata.json will be empty.")
-
-@app.on_event("startup")
-async def startup_event():
-    await build_and_save_index()
 
 # -------------------------------
 # Load FAISS Index
@@ -339,11 +221,13 @@ async def load_index_from_disk():
     global faiss_index, metadata
 
     if not os.path.exists(ENCODINGS_PATH) or not os.path.exists(METADATA_PATH):
-        print("⚠️ Encodings or metadata missing. Rebuilding index...")
-        await build_and_save_index()
+        raise FileNotFoundError("Encodings or metadata files are missing.")
+
 
     try:
-        encodings_np = np.load(ENCODINGS_PATH)
+        with h5py.File(ENCODINGS_PATH, "r") as f:
+            encodings_np = f["encodings"][:]
+        faiss.normalize_L2(encodings_np)  # Normalize for IndexFlatIP
         with open(METADATA_PATH, "r") as f:
             metadata = json.load(f)
 
@@ -357,6 +241,8 @@ async def load_index_from_disk():
 # -------------------------------
 # Match Face Endpoint
 # -------------------------------
+
+index_lock=asyncio.Lock()
 @app.post("/match_face/")
 async def match_face(file: UploadFile = File(...)):
     global faiss_index, metadata
@@ -372,9 +258,10 @@ async def match_face(file: UploadFile = File(...)):
 
         uploaded_encoding = np.array(encodings[0], dtype=np.float32).reshape(1, -1)
         faiss.normalize_L2(uploaded_encoding)
-
-        if faiss_index is None or len(metadata) == 0 or faiss_index.ntotal == 0:
-            await load_index_from_disk()
+        
+        async with index_lock:
+            if faiss_index is None or len(metadata) == 0 or faiss_index.ntotal == 0:
+               await load_index_from_disk()
 
         print("✅ Performing FAISS search...")
         D, I = faiss_index.search(uploaded_encoding, k=1)
@@ -392,8 +279,7 @@ async def match_face(file: UploadFile = File(...)):
             match = metadata[index]
             return {
                 "status": "matched",
-                "name": match["name"],
-                "medical_id": match["medical_id"]
+                "name": match["name"]
             }
 
         return {"status": "not_found"}
@@ -407,18 +293,133 @@ executor = ThreadPoolExecutor()
 
 
 
+async def append_encoding_to_index(new_encoding, new_metadata):
+    global faiss_index, metadata
+
+    new_encoding = np.array(new_encoding, dtype=np.float32).reshape(1, 128)
+    faiss.normalize_L2(new_encoding)
+    
+    # Append to HDF5 encodings file
+    if not os.path.exists(ENCODINGS_PATH):
+        with h5py.File(ENCODINGS_PATH, "w") as f:
+            f.create_dataset(
+                "encodings",
+                data=new_encoding,
+                maxshape=(None, 128),
+                chunks=True,
+                dtype='float32'
+            )
+    else:
+        with h5py.File(ENCODINGS_PATH, "a") as f:
+            ds = f["encodings"]
+            current_len = ds.shape[0]
+            ds.resize((current_len + 1, 128))
+            ds[current_len] = new_encoding
+
+    # Update metadata JSON
+    if not os.path.exists(METADATA_PATH):
+        metadata = []
+    else:
+        with open(METADATA_PATH, "r") as f:
+            metadata = json.load(f)
+    metadata.append(new_metadata)
+
+    with open(METADATA_PATH, "w") as f:
+        json.dump(metadata, f)
+
+    # Update in-memory FAISS index
+    if faiss_index is None or faiss_index.ntotal == 0:
+        with h5py.File(ENCODINGS_PATH, "r") as f:
+            all_encodings = f["encodings"][:]
+        faiss_index = faiss.IndexFlatIP(128)
+        faiss_index.add(all_encodings)
+    else:
+        faiss_index.add(new_encoding)
+
+        
 
 
+####Registering Patients
+@app.post("/api/patients")
+async def register_patient(
+    name: str = Form(...),
+    dob: str = Form(...),
+    address: str = Form(...),
+    phone_number: str = Form(...),
+    email_id: str = Form(...),
+    admissionheight: str = Form(...),
+    admissionweight: str = Form(...),
+    blood_pressure: str = Form(...),
+    age: str = Form(...),
+    gender: str = Form(...),
+    unitvisitnumber: str = Form(...),
+    apacheadmissiondx: str = Form(...),
+    picture: UploadFile = File(...)
+):
+    try:
+        # Read image and convert to base64
+        image_bytes = await picture.read()
+        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
 
+        # Load image using PIL and convert to numpy array
+        image = face_recognition.load_image_file(io.BytesIO(image_bytes))
 
+        # Detect face and extract embeddings
+        face_encodings = face_recognition.face_encodings(image)
 
+        if not face_encodings:
+            return JSONResponse(status_code=400, content={"error": "No face found in the image."})
 
+        face_embedding = face_encodings[0].tolist()  # Convert NumPy array to list for MongoDB
 
+        # Format phone number
+        if not phone_number.startswith("+"):
+            phone_number = "+91" + phone_number.lstrip("0")
 
+        # Create the patient document
+        patient_doc = {
+            "name": name,
+            "dob": dob,
+            "address": address,
+            "phone_number": phone_number,
+            "email_id": email_id,
+            "admissionheight": admissionheight,
+            "admissionweight": admissionweight,
+            "blood_pressure": blood_pressure,
+            "age": age,
+            "gender": gender,
+            "unitvisitnumber": unitvisitnumber,
+            "apacheadmissiondx": apacheadmissiondx,
+            "image_base64": image_base64,
+            "face_embedding": face_embedding
+        }
 
+        # Insert into MongoDB
+        insert_result = await patients_collection.insert_one(patient_doc)
+        
+        #only append if encodoing exists 
+        if face_embedding:
+            await append_encoding_to_index(
+                face_embedding,
+                {"name":name}
+            )
+            
+        # Send SMS using Twilio
+        message = twilio_client.messages.create(
+            body=f"Hi {name}, you are successfully registered at the hospital.",
+            from_=twilio_number,
+            to=phone_number
+        )
 
+        return {
+            "message": "Patient registered successfully",
+            "sms_sid": message.sid,
+            "patient_id": str(insert_result.inserted_id)
+        }
 
-
+    except Exception as e:
+        traceback.print_exc()
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 
 
@@ -438,6 +439,8 @@ async def get_patient_from_db(object_id):
     result = await loop.run_in_executor(executor, blocking_get_patient, object_id)
     print("✅ get_patient_from_db result:", result)
     return result
+
+
 @app.get("/get_patient/{medical_id}")
 async def get_patient(medical_id: str):
     from bson import ObjectId
